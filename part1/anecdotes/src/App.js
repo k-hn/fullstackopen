@@ -14,6 +14,7 @@ const App = () => {
 
   const [selected, setSelected] = useState(0)
   const [vote, setVote] = useState({})
+  const [topVoted, setTopVoted] = useState(0)
 
   const getRandomNumber = (max) => {
     return Math.floor(Math.random() * max)
@@ -33,29 +34,28 @@ const App = () => {
       voteCopy[anecdoteIndex] = 1
     }
 
+    if (voteCopy[anecdoteIndex] > voteCopy[topVoted]) {
+      setTopVoted(anecdoteIndex)
+    }
+
     setVote(voteCopy)
   }
 
-  const getKeyByValue = (obj, value) => {
-    return Object.keys(obj).find(key => obj[key] === value)
-  }
-
-  const mostVotedAnecdote = () => {
-    let votesCopy = { ...vote }
-    let topVote = Math.max(...Object.values(votesCopy))
-    let topVoteIndex = getKeyByValue(votesCopy, topVote)
-    return anecdotes[topVoteIndex]
+  const getAnecdoteVote = (anecdoteIndex) => {
+    return vote[anecdoteIndex] || 0
   }
 
   return (
     <div>
       <h1>Anecdote of the day</h1>
       <div>{anecdotes[selected]}</div>
+      <div>has {getAnecdoteVote(selected)} vote(s)</div>
       <Button handleClick={() => castVote(selected)} text="vote" />
       <Button handleClick={nextAnecdote} text="next anecdote" />
 
       <h1>Anecdote with most votes</h1>
-      <div>{mostVotedAnecdote()}</div>
+      <div>{anecdotes[topVoted]}</div>
+      <div>has {getAnecdoteVote(topVoted)} vote(s)</div>
     </div>
   )
 }
