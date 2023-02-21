@@ -13,6 +13,7 @@ const App = () => {
   ]
 
   const [selected, setSelected] = useState(0)
+  const [vote, setVote] = useState({})
 
   const getRandomNumber = (max) => {
     return Math.floor(Math.random() * max)
@@ -23,9 +24,22 @@ const App = () => {
     setSelected(randomNumber)
   }
 
+  const castVote = (anecdoteIndex) => {
+    let voteCopy = { ...vote }
+
+    if (anecdoteIndex in voteCopy) {
+      voteCopy[anecdoteIndex] += 1
+    } else {
+      voteCopy[anecdoteIndex] = 1
+    }
+
+    setVote(voteCopy)
+  }
+
   return (
     <div>
       <div>{anecdotes[selected]}</div>
+      <Button handleClick={() => castVote(selected)} text="vote" />
       <Button handleClick={nextAnecdote} text="next anecdote" />
     </div>
   )
