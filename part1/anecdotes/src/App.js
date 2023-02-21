@@ -36,11 +36,26 @@ const App = () => {
     setVote(voteCopy)
   }
 
+  const getKeyByValue = (obj, value) => {
+    return Object.keys(obj).find(key => obj[key] === value)
+  }
+
+  const mostVotedAnecdote = () => {
+    let votesCopy = { ...vote }
+    let topVote = Math.max(...Object.values(votesCopy))
+    let topVoteIndex = getKeyByValue(votesCopy, topVote)
+    return anecdotes[topVoteIndex]
+  }
+
   return (
     <div>
+      <h1>Anecdote of the day</h1>
       <div>{anecdotes[selected]}</div>
       <Button handleClick={() => castVote(selected)} text="vote" />
       <Button handleClick={nextAnecdote} text="next anecdote" />
+
+      <h1>Anecdote with most votes</h1>
+      <div>{mostVotedAnecdote()}</div>
     </div>
   )
 }
