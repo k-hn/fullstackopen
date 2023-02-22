@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import Filter from "./components/Filter"
+import PersonForm from './components/PersonForm'
+import Persons from './components/Persons'
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -31,7 +34,8 @@ const App = () => {
 
     const currentNameObject = {
       name: newName,
-      number: newNumber
+      number: newNumber,
+      id: persons.length + 1
     }
     setPersons(persons.concat(currentNameObject))
     setNewName("")
@@ -41,22 +45,6 @@ const App = () => {
 
   const validInputLengths = (contactName, contactNumber) => {
     return contactName.length > 0 && contactNumber.length > 0
-  }
-
-  const getFormattedContacts = (contacts) => {
-    const filteredContacts = getFilteredContacts(contacts, searchContact)
-    return filteredContacts.map(contact => {
-      return <tr key={contact.name}>
-        <td>{contact.name}</td>
-        <td>{contact.number}</td>
-      </tr>
-    })
-  }
-
-  const getFilteredContacts = (contacts, searchTerm) => {
-    return contacts.filter(
-      contact => contact.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
   }
 
   const nameExists = (contactsList, name) => {
@@ -76,36 +64,21 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
-      <div>
-        filter show with <input onChange={handleSearch} />
-      </div>
+      <Filter handleSearch={handleSearch} />
 
 
-
-
-      <h2>add a new</h2>
-      <form onSubmit={addName}>
-        <div>
-          name: <input value={newName} onChange={handleNewName} />
-        </div>
-
-        <div>
-          number: <input value={newNumber} onChange={handleNewNumber} />
-        </div>
-
-        <div>
-          <button type="submit">add</button>
-        </div>
-
-      </form>
+      <h2>Add a new</h2>
+      <PersonForm
+        addName={addName}
+        newName={newName}
+        handleNewName={handleNewName}
+        newNumber={newNumber}
+        handleNewNumber={handleNewNumber}
+      />
 
 
       <h2>Numbers</h2>
-      <table>
-        <tbody>
-          {getFormattedContacts(persons)}
-        </tbody>
-      </table>
+      <Persons persons={persons} searchContact={searchContact} />
 
     </div>
   )
