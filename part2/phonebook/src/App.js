@@ -2,9 +2,10 @@ import { useState } from 'react'
 
 const App = () => {
   const [persons, setPersons] = useState([
-    { name: 'Arto Hellas' }
+    { name: 'Arto Hellas', number: "39-44-5323523" }
   ])
   const [newName, setNewName] = useState('')
+  const [newNumber, setNewNumber] = useState("")
 
   const handleNewName = (event) => {
     setNewName(event.target.value)
@@ -13,7 +14,8 @@ const App = () => {
   const addName = (event) => {
     event.preventDefault()
     const currentNameObject = {
-      name: newName
+      name: newName,
+      number: newNumber
     }
 
     if (nameExists(persons, newName)) {
@@ -21,21 +23,26 @@ const App = () => {
     } else {
       setPersons(persons.concat(currentNameObject))
       setNewName("")
+      setNewNumber("")
     }
   }
 
-  const getContactNames = (contacts) => {
-    return contacts.map(contact => contact.name)
-  }
-
   const getFormattedContacts = (contacts) => {
-    const contactNames = getContactNames(contacts)
-    return contactNames.map(name => <div key={name}>{name}</div>)
+    return contacts.map(contact => {
+      return <tr key={contact.name}>
+        <td>{contact.name}</td>
+        <td>{contact.number}</td>
+      </tr>
+    })
   }
 
   const nameExists = (contactsList, name) => {
     const contacts = contactsList.map(contactObj => contactObj.name)
     return contacts.includes(name)
+  }
+
+  const handleNewNumber = (event) => {
+    setNewNumber(event.target.value)
   }
 
   return (
@@ -45,12 +52,23 @@ const App = () => {
         <div>
           name: <input value={newName} onChange={handleNewName} />
         </div>
+
+        <div>
+          number: <input value={newNumber} onChange={handleNewNumber} />
+        </div>
+
         <div>
           <button type="submit">add</button>
         </div>
+
       </form>
       <h2>Numbers</h2>
-      {getFormattedContacts(persons)}
+      <table>
+        <tbody>
+          {getFormattedContacts(persons)}
+        </tbody>
+      </table>
+
     </div>
   )
 }
