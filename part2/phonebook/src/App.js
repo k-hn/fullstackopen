@@ -24,12 +24,12 @@ const App = () => {
     }
   }
 
-  const getContactNames = () => {
-    return persons.map(person => person.name)
+  const getContactNames = (contacts) => {
+    return contacts.map(contact => contact.name)
   }
 
-  const getFormattedContacts = () => {
-    const contactNames = getContactNames()
+  const getFormattedContacts = (contacts) => {
+    const contactNames = getContactNames(contacts)
     return contactNames.map(name => <div key={name}>{name}</div>)
   }
 
@@ -50,7 +50,7 @@ const App = () => {
         </div>
       </form>
       <h2>Numbers</h2>
-      {getFormattedContacts()}
+      {getFormattedContacts(persons)}
     </div>
   )
 }
