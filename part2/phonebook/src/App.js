@@ -15,8 +15,13 @@ const App = () => {
     const currentNameObject = {
       name: newName
     }
-    setPersons(persons.concat(currentNameObject))
-    setNewName("")
+
+    if (nameExists(persons, newName)) {
+      alert(`${newName} is already added to the phonebook`)
+    } else {
+      setPersons(persons.concat(currentNameObject))
+      setNewName("")
+    }
   }
 
   const getContactNames = () => {
@@ -26,6 +31,11 @@ const App = () => {
   const getFormattedContacts = () => {
     const contactNames = getContactNames()
     return contactNames.map(name => <div key={name}>{name}</div>)
+  }
+
+  const nameExists = (contactsList, name) => {
+    const contacts = contactsList.map(contactObj => contactObj.name)
+    return contacts.includes(name)
   }
 
   return (
