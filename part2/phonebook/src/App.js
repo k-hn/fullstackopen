@@ -76,6 +76,22 @@ const App = () => {
     setSearchContact(searchTerm)
   }
 
+  const deleteContact = (contact) => {
+    if (!window.confirm(`Delete ${contact.name}?`)) {
+      return;
+    }
+    personsService
+      .deletePerson(contact.id)
+      .then(response => {
+        setPersons(
+          persons.filter((person) => person.id !== contact.id)
+        )
+      })
+      .catch(error => {
+        alert(`There was an error: ${error}`)
+      })
+  }
+
   return (
     <div>
       <h1>Phonebook</h1>
@@ -93,7 +109,11 @@ const App = () => {
 
 
       <h2>Numbers</h2>
-      <Persons persons={persons} searchContact={searchContact} />
+      <Persons
+        persons={persons}
+        searchContact={searchContact}
+        handleContactDelete={deleteContact}
+      />
 
     </div>
   )
