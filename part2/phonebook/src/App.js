@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import Filter from "./components/Filter"
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
-import axios from 'axios'
+import personsService from "./services/persons"
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -12,10 +12,13 @@ const App = () => {
 
   // Fetch persons data
   useEffect(() => {
-    axios
-      .get("http://localhost:3001/persons")
-      .then((response) => {
-        setPersons(response.data)
+    personsService
+      .getAll()
+      .then(personsData => {
+        setPersons(personsData)
+      })
+      .catch(error => {
+        alert(`There was an error. Error: ${error}`)
       })
   }, [])
 
@@ -42,10 +45,17 @@ const App = () => {
       number: newNumber,
       id: persons.length + 1
     }
-    setPersons(persons.concat(currentNameObject))
-    setNewName("")
-    setNewNumber("")
 
+    personsService
+      .create(currentNameObject)
+      .then(createdContact => {
+        setPersons(persons.concat(currentNameObject))
+        setNewName("")
+        setNewNumber("")
+      })
+      .catch(error => {
+        alert(`There was an error: ${error}`)
+      })
   }
 
   const validInputLengths = (contactName, contactNumber) => {
