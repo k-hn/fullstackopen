@@ -3,12 +3,14 @@ import Filter from "./components/Filter"
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import personsService from "./services/persons"
+import Notification from './components/Notification'
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState("")
   const [searchContact, setSearchContact] = useState("")
+  const [errorMessage, setErrorMessage] = useState(null)
 
   // Fetch persons data
   useEffect(() => {
@@ -18,7 +20,7 @@ const App = () => {
         setPersons(personsData)
       })
       .catch(error => {
-        alert(`There was an error. Error: ${error}`)
+        showErrorMessage(`There was an error: ${error}`, setErrorMessage)
       })
   }, [])
 
@@ -37,7 +39,8 @@ const App = () => {
 
     // Validate input
     if (!validInputLengths(newName, newNumber)) {
-      alert(`Please enter values for both name and number inputs`)
+      const message = `Please enter values for both name and number inputs`
+      showErrorMessage(message, setErrorMessage)
       return
     }
 
@@ -53,9 +56,10 @@ const App = () => {
       .then(createdContact => {
         setPersons(persons.concat(createdContact))
         clearNewContactInputs()
+        showErrorMessage(`Added ${createdContact.name}`, setErrorMessage)
       })
       .catch(error => {
-        alert(`There was an error: ${error}`)
+        showErrorMessage(`There was an error: ${error}`, setErrorMessage)
       })
   }
 
@@ -72,9 +76,10 @@ const App = () => {
       .then((receivedPerson) => {
         setPersons(persons.map(p => p.id === receivedPerson.id ? receivedPerson : p))
         clearNewContactInputs()
+        showErrorMessage(`Updated ${receivedPerson.name}`, setErrorMessage)
       })
       .catch(error => {
-        alert(`An error occurred: ${error}`)
+        showErrorMessage(`There was an error: ${error}`, setErrorMessage)
       })
   }
 
@@ -121,13 +126,26 @@ const App = () => {
         )
       })
       .catch(error => {
-        alert(`There was an error: ${error}`)
+        showErrorMessage(`There was an error: ${error}`, setErrorMessage)
       })
+  }
+
+  const showErrorMessage = (message, messageSetter, duration = 5000) => {
+    // Show error message
+    messageSetter(
+      message
+    )
+
+    // Set message timeout
+    setTimeout(() => {
+      messageSetter(null)
+    }, duration)
   }
 
   return (
     <div>
       <h1>Phonebook</h1>
+      <Notification message={errorMessage} />
       <Filter handleSearch={handleSearch} />
 
 
