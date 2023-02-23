@@ -4,12 +4,14 @@ import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import personsService from "./services/persons"
 import Notification from './components/Notification'
+import ErrorNotification from './components/ErrorNotification'
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState("")
   const [searchContact, setSearchContact] = useState("")
+  const [notificationMessage, setNotificationMessage] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
 
   // Fetch persons data
@@ -20,7 +22,7 @@ const App = () => {
         setPersons(personsData)
       })
       .catch(error => {
-        showErrorMessage(`There was an error: ${error}`, setErrorMessage)
+        showNotification(`There was an error: ${error}`, setErrorMessage)
       })
   }, [])
 
@@ -40,7 +42,7 @@ const App = () => {
     // Validate input
     if (!validInputLengths(newName, newNumber)) {
       const message = `Please enter values for both name and number inputs`
-      showErrorMessage(message, setErrorMessage)
+      showNotification(message, setErrorMessage)
       return
     }
 
@@ -56,10 +58,10 @@ const App = () => {
       .then(createdContact => {
         setPersons(persons.concat(createdContact))
         clearNewContactInputs()
-        showErrorMessage(`Added ${createdContact.name}`, setErrorMessage)
+        showNotification(`Added ${createdContact.name}`, setNotificationMessage)
       })
       .catch(error => {
-        showErrorMessage(`There was an error: ${error}`, setErrorMessage)
+        showNotification(`There was an error: ${error}`, setErrorMessage)
       })
   }
 
@@ -76,10 +78,12 @@ const App = () => {
       .then((receivedPerson) => {
         setPersons(persons.map(p => p.id === receivedPerson.id ? receivedPerson : p))
         clearNewContactInputs()
-        showErrorMessage(`Updated ${receivedPerson.name}`, setErrorMessage)
+        const message = `Updated ${receivedPerson.name}`
+        showNotification(message, setNotificationMessage)
       })
       .catch(error => {
-        showErrorMessage(`There was an error: ${error}`, setErrorMessage)
+        showNotification(`Information of ${updatedContact.name} has already been removed from server`, setErrorMessage)
+        setPersons(persons.filter(person => person.id !== updatedContact.id))
       })
   }
 
@@ -126,11 +130,11 @@ const App = () => {
         )
       })
       .catch(error => {
-        showErrorMessage(`There was an error: ${error}`, setErrorMessage)
+        showNotification(`There was an error: ${error}`, setErrorMessage)
       })
   }
 
-  const showErrorMessage = (message, messageSetter, duration = 5000) => {
+  const showNotification = (message, messageSetter, duration = 5000) => {
     // Show error message
     messageSetter(
       message
@@ -145,7 +149,8 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
-      <Notification message={errorMessage} />
+      <Notification message={notificationMessage} />
+      <ErrorNotification message={errorMessage} />
       <Filter handleSearch={handleSearch} />
 
 
