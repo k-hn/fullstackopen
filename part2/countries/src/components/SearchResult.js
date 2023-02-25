@@ -2,7 +2,7 @@ import CountryDetail from "./CountryDetail"
 import CountryList from "./CountryList"
 
 const SearchResult = (props) => {
-  const { searchResults } = props
+  const { searchResults, handleShowCountry } = props
 
   if (searchResults === null || searchResults.length === 0) {
     return null
@@ -12,7 +12,7 @@ const SearchResult = (props) => {
   if (searchResults.length === 1) {
     resultDisplay = <CountryDetail searchResults={searchResults} />
   } else if (searchResults.length > 1 && searchResults.length <= 10) {
-    resultDisplay = <CountryList searchResults={searchResults} />
+    resultDisplay = <CountryList searchResults={searchResults} handleShowCountry={handleShowCountry} />
   } else {
     resultDisplay = "Too many matches, specify another filter"
   }

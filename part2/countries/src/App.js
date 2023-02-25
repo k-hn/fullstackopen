@@ -25,6 +25,10 @@ const App = () => {
     setCountry(event.target.value)
   }
 
+  const handleShowCountry = (countryDetail) => {
+    setCountry(countryDetail.name.common)
+  }
+
   return (
     <div>
       <SearchCountry
@@ -32,7 +36,7 @@ const App = () => {
         setSearchTerm={setSearchTerm}
         handleSearchTerm={handleSearchTerm}
       />
-      <SearchResult searchResults={searchResults} />
+      <SearchResult searchResults={searchResults} handleShowCountry={handleShowCountry} />
     </div>
   )
 }

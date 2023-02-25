@@ -1,7 +1,13 @@
 const CountryList = (props) => {
-  const { searchResults } = props
+  const { searchResults, handleShowCountry } = props
 
-  const countryList = searchResults.map((result) => <div>{result.name.common}</div>)
+  const countryList = searchResults.map(
+    (result) =>
+      <div key={result.name.common}>
+        {result.name.common}
+        <button onClick={() => handleShowCountry(result)}>show</button>
+      </div>
+  )
 
   return (
     <div>
