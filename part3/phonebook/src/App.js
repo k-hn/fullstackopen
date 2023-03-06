@@ -61,7 +61,8 @@ const App = () => {
         showNotification(`Added ${createdContact.name}`, setNotificationMessage)
       })
       .catch(error => {
-        showNotification(`There was an error: ${error}`, setErrorMessage)
+        const message = error.response.data.error
+        showNotification(`${message}`, setErrorMessage)
       })
   }
 
