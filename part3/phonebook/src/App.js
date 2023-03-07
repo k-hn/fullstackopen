@@ -86,7 +86,10 @@ const App = () => {
         const defaultMessage = `Information of ${updatedContact.name} has already been removed from server`
         const message = error.response?.data.error ?? defaultMessage
         showNotification(message, setErrorMessage)
-        setPersons(persons.filter(person => person.id !== updatedContact.id))
+        if (error instanceof TypeError) {
+          setPersons(persons.filter(person => person.id !== updatedContact.id))
+        }
+
       })
   }
 
