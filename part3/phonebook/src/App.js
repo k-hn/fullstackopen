@@ -83,7 +83,9 @@ const App = () => {
         showNotification(message, setNotificationMessage)
       })
       .catch(error => {
-        showNotification(`Information of ${updatedContact.name} has already been removed from server`, setErrorMessage)
+        const defaultMessage = `Information of ${updatedContact.name} has already been removed from server`
+        const message = error.response?.data.error ?? defaultMessage
+        showNotification(message, setErrorMessage)
         setPersons(persons.filter(person => person.id !== updatedContact.id))
       })
   }
