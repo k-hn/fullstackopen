@@ -1,59 +1,42 @@
-import { useState } from "react";
-
-const History = (props) => {
-  if (props.allClicks.length == 0) {
-    return (
-      <div>
-        the app is used by pressing the buttons
-      </div>
-    )
-  }
-
+// Hello component
+const Hello = (props) => {
+  const name = props.name ?? "Stranger";
+  const age = props.age ?? "unknown";
   return (
     <div>
-      button press history: {props.allClicks.join("  ")}
+      <p>Hello {name}, you are {age} years old</p>
     </div>
   )
 }
 
-const Button = ({ handleClick, text }) => {
+const Footer = () => {
   return (
-    <button onClick={handleClick}>
-      {text}
-    </button>
+    <div>
+      greeting app created by mluukai
+    </div>
   )
 }
 
 const App = () => {
-  const [left, setLeft] = useState(0);
-  const [right, setRight] = useState(0);
-  const [allClicks, setAllClicks] = useState([]);
-  const [total, setTotal] = useState(0);
-
-  const handleLeftClicks = () => {
-    setAllClicks(allClicks.concat("L"));
-    const updatedLeft = left + 1;
-    setLeft(updatedLeft);
-    setTotal(updatedLeft + right);
-  }
-
-  const handleRightClicks = () => {
-    setAllClicks(allClicks.concat("R"));
-    const updatedRight = right + 1;
-    setRight(updatedRight);
-    setTotal(left + updatedRight);
-  }
+  const name = "Peter"
+  const age = 10
+  const friends = [
+    { name: "Peter", age: 4 },
+    { name: "Maya", age: 10 }
+  ];
+  const friends2 = ["Peter", "Maya"];
 
   return (
-    <div>
-      {left}
-      <Button handleClick={handleLeftClicks} text="left" />
-      <Button handleClick={handleRightClicks} text="right" />
-      {right}
-      <p>total: {total}</p>
-      <History allClicks={allClicks} />
-    </div>
+    <>
+      <h1>Greetings</h1>
+      <Hello name="Maya" age={26 + 10} />
+      <Hello name={name} age={age} />
+      <Hello />
+      <Footer />
+      <p>{friends[0].name} {friends[0].age}</p>
+      <p>{friends}</p>
+    </>
   )
 }
 
-export default App;
+export default App
