@@ -1,8 +1,8 @@
 import {useState} from "react"
 
-const StatisticLine = (props) => {
+const StatisticLine = ({text, value}) => {
     return (
-	<p>{props.statName} {props.statValue}</p>
+	<p>{text} {value}</p>
     )
 }
 
@@ -22,12 +22,12 @@ const Statistics = ({good, bad, neutral}) => {
     return (
 	<>
 	    <h1>statistics</h1>
-	    <StatisticLine statName="good" statValue={good}/>
-	    <StatisticLine statName="neutral" statValue={neutral} />
-	    <StatisticLine statName="bad" statValue={bad} />
-	    <StatisticLine statName="all" statValue={all} />
-	    <StatisticLine statName="average" statValue={average} />
-	    <StatisticLine statName="positive" statValue={positive} />
+	    <StatisticLine text="good" value={good}/>
+	    <StatisticLine text="neutral" value={neutral} />
+	    <StatisticLine text="bad" value={bad} />
+	    <StatisticLine text="all" value={all} />
+	    <StatisticLine text="average" value={average} />
+	    <StatisticLine text="positive" value={positive} />
 	</>
     )
 }
