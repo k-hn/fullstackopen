@@ -16,6 +16,11 @@ const App = () => {
     const handleBad = () => {
 	setBad(bad + 1)
     }
+
+    const all = good + bad + neutral
+    const total_sentiment = (good * 1) + (neutral * 0) + (bad * -1)
+    const average = total_sentiment / all
+    const positive = (good / all) * 100
     
     return (
 	<div>
@@ -28,6 +33,10 @@ const App = () => {
 	    <p>good {good}</p>
 	    <p>neutral {neutral}</p>
 	    <p>bad {bad}</p>
+	    <p>all {all}</p>
+	    <p>average {average}</p>
+	    <p>positive {positive} %</p>
+	    
 	</div>
     )
 }
