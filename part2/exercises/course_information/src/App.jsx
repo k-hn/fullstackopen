@@ -28,8 +28,9 @@ const Content = (props) => {
 }
 
 // Total
-const Total = (props) => {
-  const total = props.parts[0].exercises + props.parts[1].exercises + props.parts[2].exercises;
+const Total = ({ parts }) => {
+  // Calculate total using reduce
+  const total = Object.values(parts).reduce((acc, { exercises }) => exercises + acc, 0)
 
   return (
     <>
