@@ -10,7 +10,11 @@ const App = () => {
     event.preventDefault()
     // Prevent addition of empty strings
     if (newName === "") {
-      console.log("no value")
+      return
+    }
+
+    if (isDuplicate(newName)) {
+      alert(`${newName} is already added to phonebook`)
       return
     }
 
@@ -20,6 +24,12 @@ const App = () => {
     }
     setPersons(persons.concat(personsObject))
     setNewName("")
+  }
+
+  const isDuplicate = (name) => {
+    const personObject = { name }
+    const result = persons.some(person => person.name === name)
+    return result
   }
 
   const handleNameChange = (event) => {
