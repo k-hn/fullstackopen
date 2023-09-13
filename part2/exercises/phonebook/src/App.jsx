@@ -14,7 +14,7 @@ const App = () => {
   // Fetch data from server
   useEffect(() => {
     contactService
-      .getAll()
+      .getAllContacts()
       .then((contacts) => {
         setPersons(contacts)
       })
@@ -39,7 +39,7 @@ const App = () => {
     }
     // Save to backend
     contactService
-      .create(personObject)
+      .createContact(personObject)
       .then((newContact) => {
         setPersons(persons.concat(newContact))
         setNewName("")
@@ -66,6 +66,16 @@ const App = () => {
     setSearchTerm(event.target.value.toLowerCase())
   }
 
+  const handlePersonDelete = (contact) => {
+    if (confirm(`Delete ${contact.name}`)) {
+      contactService
+        .deleteContact(contact.id)
+        .then(() => {
+          setPersons(persons.filter(p => p.id !== contact.id))
+        })
+    }
+  }
+
   const filteredPersons = persons.filter((person) =>
     person.name.toLowerCase().includes(searchTerm)
   )
@@ -89,7 +99,9 @@ const App = () => {
       />
 
       <h2>Numbers</h2>
-      <Persons filteredPersons={filteredPersons} />
+      <Persons
+        filteredPersons={filteredPersons}
+        handlePersonDelete={handlePersonDelete} />
 
     </div>
   )
