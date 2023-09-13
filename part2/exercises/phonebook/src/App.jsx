@@ -3,6 +3,7 @@ import axios from 'axios'
 import Filter from "./components/Filter"
 import PersonForm from "./components/PersonForm"
 import Persons from "./components/Persons"
+import contactService from "./services/contacts"
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -12,10 +13,10 @@ const App = () => {
 
   // Fetch data from server
   useEffect(() => {
-    axios
-      .get("http://localhost:3001/persons")
-      .then((response) => {
-        setPersons(response.data)
+    contactService
+      .getAll()
+      .then((contacts) => {
+        setPersons(contacts)
       })
   }, [])
 
@@ -37,15 +38,15 @@ const App = () => {
       number: newNumber
     }
     // Save to backend
-    axios
-      .post("http://localhost:3001/persons", personObject)
-      .then((response) => {
-        setPersons(persons.concat(response.data))
+    contactService
+      .create(personObject)
+      .then((newContact) => {
+        setPersons(persons.concat(newContact))
+        setNewName("")
+        setNewNumber("")
       })
 
-    // setPersons(persons.concat(personObject))
-    setNewName("")
-    setNewNumber("")
+
   }
 
   const isDuplicate = (name) => {
