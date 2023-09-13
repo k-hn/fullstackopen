@@ -17,8 +17,14 @@ const deleteContact = (id) => {
   return request
 }
 
+const updateContact = (personObject, id) => {
+  const request = axios.put(`${url}/${id}`, personObject)
+  return request.then(response => response.data)
+}
+
 export default {
   createContact,
   getAllContacts,
-  deleteContact
+  deleteContact,
+  updateContact
 }

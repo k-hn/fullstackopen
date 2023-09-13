@@ -27,30 +27,51 @@ const App = () => {
       return
     }
 
-    // Prevent addition of duplicates to phonebook
-    if (isDuplicate(newName)) {
-      alert(`${newName} is already added to phonebook`)
-      return
-    }
-
     const personObject = {
       name: newName,
       number: newNumber
     }
+
+    // Prevent addition of duplicates to phonebook
+    let existingContact = null
+    if (existingContact = isDuplicate(newName)) {
+      if (confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        updateContactDetails(personObject, existingContact)
+      }
+      return
+    }
+
     // Save to backend
     contactService
       .createContact(personObject)
       .then((newContact) => {
         setPersons(persons.concat(newContact))
-        setNewName("")
-        setNewNumber("")
+        clearPersonFormInputs()
       })
+  }
 
+  const clearPersonFormInputs = () => {
+    setNewName("")
+    setNewNumber("")
+  }
 
+  const updateContactDetails = (personObject, existingContact) => {
+    contactService
+      .updateContact(personObject, existingContact.id)
+      .then((updatedPerson) => {
+        // update contact list
+        setPersons(persons
+          .filter(p => p.name !== personObject.name)
+          .concat(updatedPerson))
+        // const personsCopy = persons
+        // const personIndex = personsCopy.indexOf(existingContact)
+        // setPersons(personsCopy.toSpliced(personIndex, 1, updatedPerson))
+        clearPersonFormInputs()
+      })
   }
 
   const isDuplicate = (name) => {
-    const result = persons.some(person => person.name === name)
+    const result = persons.find(person => person.name === name)
     return result
   }
 
