@@ -4,12 +4,18 @@ import Filter from "./components/Filter"
 import PersonForm from "./components/PersonForm"
 import Persons from "./components/Persons"
 import contactService from "./services/contacts"
+import Notification from './components/Notification'
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState("")
   const [newNumber, setNewNumber] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
+  const [notification, setNotification] = useState({
+    show: false,
+    name: "",
+    isSuccess: false
+  })
 
   // Fetch data from server
   useEffect(() => {
@@ -46,6 +52,13 @@ const App = () => {
       .createContact(personObject)
       .then((newContact) => {
         setPersons(persons.concat(newContact))
+
+        // Show notification
+        showNotification(newContact.name, true)
+        // Hide notification after five seconds
+        setTimeout(() => {
+          hideNotification()
+        }, 5000)
         clearPersonFormInputs()
       })
   }
@@ -94,6 +107,12 @@ const App = () => {
         .then(() => {
           setPersons(persons.filter(p => p.id !== contact.id))
         })
+        .catch((error) => {
+          showNotification(contact.name, false)
+          setTimeout(() => {
+            hideNotification()
+          }, 5000)
+        })
     }
   }
 
@@ -101,10 +120,31 @@ const App = () => {
     person.name.toLowerCase().includes(searchTerm)
   )
 
+  const showNotification = (name, isSuccess) => {
+    setNotification({
+      show: true,
+      name,
+      isSuccess
+    })
+  }
+
+  const hideNotification = () => {
+    setNotification({
+      show: false,
+      name: "",
+      isSuccess: false
+    })
+  }
+
 
   return (
     <div>
       <h2>Phonebook</h2>
+      {notification.show &&
+        <Notification
+          name={notification.name}
+          isSuccess={notification.isSuccess}
+        />}
       <Filter
         searchTerm={searchTerm}
         handleSearchTermChange={handleSearchTermChange}
