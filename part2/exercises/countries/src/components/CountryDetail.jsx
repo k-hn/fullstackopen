@@ -1,5 +1,6 @@
+import WeatherDetail from "./WeatherDetail"
+
 const CountryDetail = ({ country }) => {
-  console.log(country.languages)
   return (
     <>
       <h1>{country.name.common}</h1>
@@ -14,8 +15,11 @@ const CountryDetail = ({ country }) => {
       <div>
         <img height={100} src={country.flags.svg} alt={country.flags.alt} />
       </div>
+
+      <WeatherDetail country={country} />
     </>
   )
 }
+
 
 export default CountryDetail
