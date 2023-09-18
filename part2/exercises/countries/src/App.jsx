@@ -6,7 +6,7 @@ import CountryList from './components/CountryList'
 
 const App = () => {
   const [countries, setCountries] = useState([])
-  const [searchTerm, setSearchTerm] = useState("")
+  const [searchResults, setSearchResults] = useState([])
 
   useEffect(() => {
     countryService
@@ -15,21 +15,24 @@ const App = () => {
   }, [])
 
   const onSearch = (event) => {
-    setSearchTerm(event.target.value)
+    const searchTerm = event.target.value
+    setSearchResults(countries
+      .filter(country => {
+        return country.name.common.toLowerCase().includes(searchTerm.toLowerCase())
+      }))
   }
 
-  const countryList = countries
-    .filter(country => {
-      return country.name.common.toLowerCase().includes(searchTerm.toLowerCase())
-    })
+  const handleShowClick = (country) => {
+    setSearchResults([country])
+  }
 
-  const showCountryView = (countryList) => {
-    const isSingleResult = countryList.length === 1
+  const showCountryView = () => {
+    const isSingleResult = searchResults.length === 1
     let result;
     if (isSingleResult) {
-      result = <CountryDetail country={countryList[0]} />
+      result = <CountryDetail country={searchResults[0]} />
     } else {
-      result = <CountryList countryList={countryList} />
+      result = <CountryList countryList={searchResults} handleClick={handleShowClick} />
     }
     return result
   }
@@ -43,7 +46,7 @@ const App = () => {
 
       {/* Country list */}
       <div>
-        {showCountryView(countryList)}
+        {showCountryView(searchResults)}
       </div>
     </div>
   )
