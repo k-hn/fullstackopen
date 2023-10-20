@@ -1,6 +1,8 @@
 const express = require("express")
 const app = express()
 
+app.use(express.json())
+
 let persons = [
   { 
       "id": 1,
@@ -58,6 +60,36 @@ app.delete("/api/persons/:id", (request, response) => {
 
   return response.status(204).end()
 })
+
+
+app.post("/api/persons", (request, response) => {
+  const body = request.body
+
+  const newPerson = {
+    name: body.name,
+    number: body.number,
+    id: generateId()    
+  }
+
+  persons = persons.concat(newPerson)
+
+  return response.status(201).json(newPerson)
+})
+
+const generateId = () => {
+  const existingIds = persons.map(person => person.id)
+
+  // Try for a unique id 10 times. If unsuccessful, default to -1
+  for (let i = 0; i < 10; i++) {
+    // Generate random number from 0 to 10000
+    const randomNumber = Math.floor(Math.random() * 10001)
+    if (!existingIds.includes(randomNumber)) {
+      return randomNumber
+    }
+  }
+
+  return -1
+}
 
 const PORT = 3001
 app.listen(PORT, () => {
