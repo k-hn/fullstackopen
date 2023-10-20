@@ -71,6 +71,23 @@ app.post("/api/persons", (request, response) => {
     id: generateId()    
   }
 
+  // Error handling
+  // Fail if name or number is missing
+  // Fail if name already exists in the phonebook
+  if (!body.name) {
+    return response.status(400).json({
+      errror: "name is required"
+    })
+  } else if (!body.number) {
+    return response.status(400).json({
+      error: "number is required"
+    })
+  } else if (persons.map(person => person.name).includes(body.name)) {
+    return response.status(400).json({
+      error: "name must be unique"
+    })
+  }
+  
   persons = persons.concat(newPerson)
 
   return response.status(201).json(newPerson)
