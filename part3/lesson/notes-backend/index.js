@@ -1,7 +1,8 @@
 const express = require("express")
+const cors = require("cors")
 const app = express()
 
-
+// Middleware - before routes
 const requestLogger = (request, response, next) => {
   console.log("Method: ", request.method)
   console.log("Path: ", request.path)
@@ -10,14 +11,13 @@ const requestLogger = (request, response, next) => {
   next()
 }
 
-const unknownEndpoint = (request, response) => {
-  response.status(404).send({error: "unknown endpoint"})
-}
 
 app.use(express.json())
+app.use(cors())
 app.use(requestLogger)
-app.use(unknownEndpoint)
+app.use(express.static("dist"))
 
+// Routes
 let notes = [
   {
     id: 1,
@@ -92,8 +92,14 @@ app.post("/api/notes", (request, response) => {
 })
 
 
-// Middleware
+// Middleware - After routes
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({error: "unknown endpoint"})
+}
 
-const PORT = 3001
-app.listen(PORT)
-console.log(`Server running on port ${PORT}`)
+app.use(unknownEndpoint)
+
+const PORT = process.env.PORT || 3001
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`)
+})
