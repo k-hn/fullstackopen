@@ -1,6 +1,8 @@
+require("dotenv").config()
 const express = require("express")
 const morgan = require("morgan")
 const cors = require("cors")
+const Person = require("./models/person")
 const app = express()
 
 morgan.token("body", function getBody(req) {
@@ -13,37 +15,40 @@ app.use(cors())
 app.use(express.static("dist"))
 
 let persons = [
-  { 
-      "id": 1,
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": 2,
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": 3,
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": 4,
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
+  {
+    "id": 1,
+    "name": "Arto Hellas",
+    "number": "040-123456"
+  },
+  {
+    "id": 2,
+    "name": "Ada Lovelace",
+    "number": "39-44-5323523"
+  },
+  {
+    "id": 3,
+    "name": "Dan Abramov",
+    "number": "12-43-234345"
+  },
+  {
+    "id": 4,
+    "name": "Mary Poppendieck",
+    "number": "39-23-6423122"
+  }
 ]
 
 app.get("/api/persons", (request, response) => {
-  return response.json(persons)
+  Person.find({})
+    .then(people => {
+      response.json(people)
+    })
 })
 
 
 app.get("/info", (request, response) => {
   const numPersons = persons.length
   const now = new Date()
-  
+
   return response.send(`
       <p>Phonebook has info for ${numPersons} people</p>
       <p>${now.toDateString()} ${now.toTimeString()}</p>
@@ -52,6 +57,7 @@ app.get("/info", (request, response) => {
 
 
 app.get("/api/persons/:id", (request, response) => {
+  /*
   const id = Number(request.params.id)
   const person = persons.find(person => id === person.id)
 
@@ -60,6 +66,12 @@ app.get("/api/persons/:id", (request, response) => {
   } else {
     return response.status(404).end()
   }
+  */
+
+  Person.findById(request.params.id)
+    .then(person => {
+      response.json(person)
+    })
 })
 
 
@@ -77,7 +89,7 @@ app.post("/api/persons", (request, response) => {
   const newPerson = {
     name: body.name,
     number: body.number,
-    id: generateId()    
+    id: generateId()
   }
 
   // Error handling
@@ -96,7 +108,7 @@ app.post("/api/persons", (request, response) => {
       error: "name must be unique"
     })
   }
-  
+
   persons = persons.concat(newPerson)
 
   return response.status(201).json(newPerson)
@@ -117,7 +129,7 @@ const generateId = () => {
   return -1
 }
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })

@@ -5,10 +5,10 @@ const mongoose = require("mongoose")
 const Note = require("./models/note")
 const app = express()
 
-const url = process.env.MONGODB_URI
+// const url = process.env.MONGODB_URI
 
-console.log("connecting to in index", url)
-
+// console.log("connecting to in index", url)
+/*
 mongoose.connect(url)
   .then(result => {
     console.log("connected to MongoDB")
@@ -16,7 +16,7 @@ mongoose.connect(url)
   .catch(error => {
     console.log("error connecting to MongoDB: ", error.message)
   })
-
+*/
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: "unknown endpoint" })
 }
