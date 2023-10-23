@@ -57,17 +57,6 @@ app.get("/info", (request, response) => {
 
 
 app.get("/api/persons/:id", (request, response) => {
-  /*
-  const id = Number(request.params.id)
-  const person = persons.find(person => id === person.id)
-
-  if (person) {
-    return response.json(person)
-  } else {
-    return response.status(404).end()
-  }
-  */
-
   Person.findById(request.params.id)
     .then(person => {
       response.json(person)
@@ -95,23 +84,29 @@ app.post("/api/persons", (request, response) => {
   // Error handling
   // Fail if name or number is missing
   // Fail if name already exists in the phonebook
-  if (!body.name) {
+  if (body.name === undefined) {
     return response.status(400).json({
       errror: "name is required"
     })
-  } else if (!body.number) {
+  } else if (body.number === undefined) {
     return response.status(400).json({
       error: "number is required"
     })
-  } else if (persons.map(person => person.name).includes(body.name)) {
+  }
+  /*
+  else if (persons.map(person => person.name).includes(body.name)) {
     return response.status(400).json({
       error: "name must be unique"
     })
   }
-
-  persons = persons.concat(newPerson)
-
-  return response.status(201).json(newPerson)
+  */
+  const person = new Person({
+    name: body.name,
+    number: body.number
+  })
+  person.save().then(savedPerson => {
+    response.status(201).json(savedPerson)
+  })
 })
 
 const generateId = () => {
