@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
 import Filter from "./components/Filter"
 import PersonForm from "./components/PersonForm"
 import Persons from "./components/Persons"
@@ -13,7 +12,7 @@ const App = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [notification, setNotification] = useState({
     show: false,
-    name: "",
+    message: "",
     isSuccess: false
   })
 
@@ -54,13 +53,21 @@ const App = () => {
         setPersons(persons.concat(newContact))
 
         // Show notification
-        showNotification(newContact.name, true)
+        showNotification(`Added ${newContact.name}`, true)
         // Hide notification after five seconds
         setTimeout(() => {
           hideNotification()
         }, 5000)
         clearPersonFormInputs()
       })
+    .catch(error => {
+      console.log(error.response.data.error)
+      showNotification(error.response.data.error, false)
+      setTimeout(() => {
+        hideNotification()
+      }, 5000)
+      
+    })
   }
 
   const clearPersonFormInputs = () => {
@@ -120,10 +127,10 @@ const App = () => {
     person.name.toLowerCase().includes(searchTerm)
   )
 
-  const showNotification = (name, isSuccess) => {
+  const showNotification = (message, isSuccess) => {
     setNotification({
       show: true,
-      name,
+      message,
       isSuccess
     })
   }
@@ -131,7 +138,7 @@ const App = () => {
   const hideNotification = () => {
     setNotification({
       show: false,
-      name: "",
+      message: "",
       isSuccess: false
     })
   }
@@ -142,7 +149,7 @@ const App = () => {
       <h2>Phonebook</h2>
       {notification.show &&
         <Notification
-          name={notification.name}
+          message={notification.message}
           isSuccess={notification.isSuccess}
         />}
       <Filter

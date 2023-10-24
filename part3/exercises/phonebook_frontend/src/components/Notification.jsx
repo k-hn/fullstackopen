@@ -1,8 +1,9 @@
-const Notification = ({ isSuccess, name }) => {
+const Notification = ({ isSuccess, message }) => {
+  /*
   const message = isSuccess
     ? `Added ${name}`
     : `Information of ${name} has already been removed from server`
-
+  */
   const result = isSuccess
     ? <SuccessNotification message={message} />
     : <ErrorNotification message={message} />
