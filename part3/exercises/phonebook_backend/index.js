@@ -14,45 +14,27 @@ app.use(morgan(":method :url :status :res[Content-Length] - :response-time ms :b
 app.use(cors())
 app.use(express.static("dist"))
 
-let persons = [
-  {
-    "id": 1,
-    "name": "Arto Hellas",
-    "number": "040-123456"
-  },
-  {
-    "id": 2,
-    "name": "Ada Lovelace",
-    "number": "39-44-5323523"
-  },
-  {
-    "id": 3,
-    "name": "Dan Abramov",
-    "number": "12-43-234345"
-  },
-  {
-    "id": 4,
-    "name": "Mary Poppendieck",
-    "number": "39-23-6423122"
-  }
-]
-
-app.get("/api/persons", (request, response) => {
+app.get("/api/persons", (request, response, next) => {
   Person.find({})
     .then(people => {
       response.json(people)
     })
+    .catch(error => next(error))
 })
 
 
-app.get("/info", (request, response) => {
-  const numPersons = persons.length
-  const now = new Date()
+app.get("/info", (request, response, next) => {
+  Person.find({})
+    .then(result => {
+      const numPersons = result.length
+      const now = new Date()
 
-  return response.send(`
+      response.send(`
       <p>Phonebook has info for ${numPersons} people</p>
       <p>${now.toDateString()} ${now.toTimeString()}</p>
-    `)
+      `)
+    })
+    .catch(error => next(error))
 })
 
 
