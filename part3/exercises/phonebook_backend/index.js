@@ -75,18 +75,12 @@ app.delete("/api/persons/:id", (request, response, next) => {
 })
 
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
   const body = request.body
-
-  const newPerson = {
-    name: body.name,
-    number: body.number,
-    id: generateId()
-  }
 
   // Error handling
   // Fail if name or number is missing
-  // Fail if name already exists in the phonebook
+  // Update if name already exists in the phonebook
   if (body.name === undefined) {
     return response.status(400).json({
       errror: "name is required"
@@ -96,35 +90,56 @@ app.post("/api/persons", (request, response) => {
       error: "number is required"
     })
   }
-  /*
-  else if (persons.map(person => person.name).includes(body.name)) {
-    return response.status(400).json({
-      error: "name must be unique"
+
+  // Check if name exists
+  Person.find({ name: body.name })
+    .then(result => {
+      if (result.length === 0) {
+        // Nonexisting name
+        const person = new Person({
+          name: body.name,
+          number: body.number
+        })
+
+        person.save()
+          .then(savedPerson => {
+            response.status(201).json(savedPerson)
+          })
+          .catch(error => next(error))
+      } else {
+        // Existing name
+        const existingRecord = result[0]
+        const updatedPersonObject = {
+          name: body.name,
+          number: body.number
+        }
+
+        updatePerson(updatedPersonObject, existingRecord._id)
+          .then(result => {
+            response.json(result)
+          })
+          .catch(error => next(error))
+      }
     })
-  }
-  */
-  const person = new Person({
-    name: body.name,
-    number: body.number
-  })
-  person.save().then(savedPerson => {
-    response.status(201).json(savedPerson)
-  })
+    .catch(error => next(error))
 })
 
-const generateId = () => {
-  const existingIds = persons.map(person => person.id)
+app.put("/api/persons/:id", (request, response, next) => {
+  const body = request.body
 
-  // Try for a unique id 10 times. If unsuccessful, default to -1
-  for (let i = 0; i < 10; i++) {
-    // Generate random number from 0 to 10000
-    const randomNumber = Math.floor(Math.random() * 10001)
-    if (!existingIds.includes(randomNumber)) {
-      return randomNumber
-    }
+  const person = {
+    name: body.name,
+    number: body.number
   }
+  updatePerson(person, request.params.id)
+    .then(result => {
+      response.json(result)
+    })
+    .catch(error => next(error))
+})
 
-  return -1
+const updatePerson = (updatedPersonObject, personID) => {
+  return Person.findByIdAndUpdate(personID, updatedPersonObject, { new: true })
 }
 
 const errorHandler = (error, request, response, next) => {
