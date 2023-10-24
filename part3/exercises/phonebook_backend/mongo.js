@@ -1,14 +1,14 @@
-const mongoose = require("mongoose")
+const mongoose = require('mongoose')
 
 if (process.argv.length < 3) {
-  console.log("give password as argument")
+  console.log('give password as argument')
   process.exit(3)
 }
 
 const password = process.argv[2]
 const url = `mongodb+srv://fullstack:${password}@cluster0.1wbrwbm.mongodb.net/Phonebook?retryWrites=true&w=majority`
 
-mongoose.set("strictQuery", false)
+mongoose.set('strictQuery', false)
 mongoose.connect(url)
 
 const personSchema = new mongoose.Schema({
@@ -16,7 +16,7 @@ const personSchema = new mongoose.Schema({
   number: String
 })
 
-const Person = mongoose.model("Person", personSchema)
+const Person = mongoose.model('Person', personSchema)
 
 const addPerson = (name, number) => {
   const person = new Person({
@@ -24,8 +24,8 @@ const addPerson = (name, number) => {
     number
   })
 
-  person.save().then(result => {
-    console.log("person saved")
+  person.save().then(() => {
+    console.log('person saved')
     mongoose.connection.close()
   })
 }
@@ -38,7 +38,7 @@ const getPhonebook = () => {
 }
 
 const printPhonebook = (phonebook) => {
-  console.log("phonebook")
+  console.log('phonebook')
   phonebook.forEach(person => printPersonRow(person))
 }
 
@@ -46,7 +46,7 @@ const printPersonRow = (person) => {
   console.log(`${person.name} ${person.number}`)
 }
 
-if (process.argv.length === 5) {  
+if (process.argv.length === 5) {
   // add person to phonebook
   const name = process.argv[3]
   const number = process.argv[4]
@@ -56,5 +56,5 @@ if (process.argv.length === 5) {
   // get phonebook
   getPhonebook()
 } else {
-  console.log("Wrong number of arguments provided")
+  console.log('Wrong number of arguments provided')
 }
