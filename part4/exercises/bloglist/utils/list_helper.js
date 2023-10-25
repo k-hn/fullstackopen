@@ -24,6 +24,10 @@ const favouriteBlog = (blogs) => {
 }
 
 const mostBlogs = (blogs) => {
+  if (blogs.length === 0) {
+    return {}
+  }
+
   const statCompilereducer = (accumulator, item) => {
     if (item.author in accumulator) {
       // hit
@@ -47,11 +51,16 @@ const mostBlogs = (blogs) => {
   }
 
   const compiledBlogStats = blogs.reduce(statCompilereducer, {})
+  const firstAuthor = Object.keys(compiledBlogStats)[0]
   const result = Object.keys(compiledBlogStats)
-    .reduce(mostBlogsReducer, { author: 'unknown', blogs: -1 })
+    .reduce(mostBlogsReducer, { author: firstAuthor, blogs: compiledBlogStats[firstAuthor].blogs })
 
-  return result.author === 'unknown' ? {} : result
+  return result
 }
+
+// const mostLikes = (blogs) = {
+
+// }
 
 module.exports = {
   dummy,
