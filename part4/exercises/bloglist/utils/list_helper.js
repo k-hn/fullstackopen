@@ -58,13 +58,45 @@ const mostBlogs = (blogs) => {
   return result
 }
 
-// const mostLikes = (blogs) = {
+const mostLikes = (blogs) => {
+  if (blogs.length === 0) {
+    return {}
+  }
 
-// }
+  const likesReducer = (accumulator, item) => {
+    if (item.author in accumulator) {
+      // hit
+      accumulator[item.author].likes += item.likes
+    } else {
+      // miss
+      accumulator[item.author] = { likes: item.likes }
+    }
+    return accumulator
+  }
+
+  const mostLikesReducer = (accumulator, item) => {
+    if (compiledLikes[item].likes > accumulator.likes) {
+      accumulator = {
+        author: item,
+        likes: compiledLikes[item].likes
+      }
+    }
+
+    return accumulator
+  }
+
+  const compiledLikes = blogs.reduce(likesReducer, {})
+  const firstAuthor = Object.keys(compiledLikes)[0]
+  const result = Object.keys(compiledLikes)
+    .reduce(mostLikesReducer, { author: firstAuthor, likes: compiledLikes[firstAuthor].likes })
+
+  return result
+}
 
 module.exports = {
   dummy,
   totalLikes,
   favouriteBlog,
-  mostBlogs
+  mostBlogs,
+  mostLikes
 }
