@@ -23,8 +23,39 @@ const favouriteBlog = (blogs) => {
   }
 }
 
+const mostBlogs = (blogs) => {
+  const statCompilereducer = (accumulator, item) => {
+    if (item.author in accumulator) {
+      // hit
+      accumulator[item.author].blogs += 1
+    } else {
+      // no hit
+      accumulator[item.author] = { blogs: 1 }
+    }
+    return accumulator
+  }
+
+  const mostBlogsReducer = (accumulator, item) => {
+    if (compiledBlogStats[item].blogs > accumulator.blogs) {
+
+      accumulator = {
+        author: item,
+        blogs: compiledBlogStats[item].blogs
+      }
+    }
+    return accumulator
+  }
+
+  const compiledBlogStats = blogs.reduce(statCompilereducer, {})
+  const result = Object.keys(compiledBlogStats)
+    .reduce(mostBlogsReducer, { author: 'unknown', blogs: -1 })
+
+  return result.author === 'unknown' ? {} : result
+}
+
 module.exports = {
   dummy,
   totalLikes,
-  favouriteBlog
+  favouriteBlog,
+  mostBlogs
 }
