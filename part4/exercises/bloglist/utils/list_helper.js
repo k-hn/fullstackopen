@@ -11,86 +11,76 @@ const totalLikes = (blogs) => {
 }
 
 const favouriteBlog = (blogs) => {
-  const sortedBlogs = blogs.toSorted((a, b) => b.likes - a.likes)
-
-  if (sortedBlogs.length > 0) {
-    const { title, author, likes } = sortedBlogs[0]
-    return {
-      title, author, likes
-    }
-  } else {
+  if (blogs.length === 0) {
     return {}
   }
+
+  const sortedBlogs = blogs.toSorted((a, b) => b.likes - a.likes)
+
+  const { title, author, likes } = sortedBlogs[0]
+  return {
+    title,
+    author,
+    likes
+  }
+
 }
 
 const mostBlogs = (blogs) => {
+  // return empty object if blog array is empty
   if (blogs.length === 0) {
     return {}
   }
 
-  const statCompilereducer = (accumulator, item) => {
-    if (item.author in accumulator) {
+  const blogsReducer = (acc, blog) => {
+    const searchIndex = acc.findIndex(item => item.author === blog.author)
+    if (searchIndex !== -1) {
       // hit
-      accumulator[item.author].blogs += 1
+      acc[searchIndex].blogs += 1
     } else {
-      // no hit
-      accumulator[item.author] = { blogs: 1 }
+      acc.push({
+        author: blog.author,
+        blogs: 1
+      })
     }
-    return accumulator
+    return acc
   }
 
-  const mostBlogsReducer = (accumulator, item) => {
-    if (compiledBlogStats[item].blogs > accumulator.blogs) {
+  // reduce and sort entries in descending order of number of blogs
+  const mostBlogsArray = blogs
+    .reduce(blogsReducer, [])
+    .toSorted((a, b) => b.blogs - a.blogs)
 
-      accumulator = {
-        author: item,
-        blogs: compiledBlogStats[item].blogs
-      }
-    }
-    return accumulator
-  }
-
-  const compiledBlogStats = blogs.reduce(statCompilereducer, {})
-  const firstAuthor = Object.keys(compiledBlogStats)[0]
-  const result = Object.keys(compiledBlogStats)
-    .reduce(mostBlogsReducer, { author: firstAuthor, blogs: compiledBlogStats[firstAuthor].blogs })
-
-  return result
+  return mostBlogsArray[0]
 }
 
 const mostLikes = (blogs) => {
+  // return empty object if blog array is empty
   if (blogs.length === 0) {
     return {}
   }
 
-  const likesReducer = (accumulator, item) => {
-    if (item.author in accumulator) {
+  const likesReducer = (acc, blog) => {
+    const searchIndex = acc.findIndex(item => item.author === blog.author)
+    if (searchIndex !== -1) {
       // hit
-      accumulator[item.author].likes += item.likes
+      acc[searchIndex].likes += blog.likes
     } else {
       // miss
-      accumulator[item.author] = { likes: item.likes }
+      acc.push({
+        author: blog.author,
+        likes: blog.likes
+      })
     }
-    return accumulator
+    return acc
   }
 
-  const mostLikesReducer = (accumulator, item) => {
-    if (compiledLikes[item].likes > accumulator.likes) {
-      accumulator = {
-        author: item,
-        likes: compiledLikes[item].likes
-      }
-    }
+  // reduce and sort entries in descending order of number of likes
+  const mostLikesArray = blogs
+    .reduce(likesReducer, [])
+    .toSorted((a, b) => b.likes - a.likes)
 
-    return accumulator
-  }
-
-  const compiledLikes = blogs.reduce(likesReducer, {})
-  const firstAuthor = Object.keys(compiledLikes)[0]
-  const result = Object.keys(compiledLikes)
-    .reduce(mostLikesReducer, { author: firstAuthor, likes: compiledLikes[firstAuthor].likes })
-
-  return result
+  return mostLikesArray[0]
 }
 
 module.exports = {
@@ -98,5 +88,5 @@ module.exports = {
   totalLikes,
   favouriteBlog,
   mostBlogs,
-  mostLikes
+  mostLikes,
 }
