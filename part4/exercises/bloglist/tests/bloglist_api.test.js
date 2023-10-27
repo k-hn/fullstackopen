@@ -9,7 +9,7 @@ const api = supertest(app)
 beforeEach(async () => {
   await Blog.deleteMany()
   await Blog.insertMany(helper.initialBloglist)
-}, 10000)
+}, 15000)
 
 afterAll(async () => {
   await mongoose.connection.close()
@@ -50,4 +50,21 @@ test('a valid note can be added', async () => {
 
   const currentBlogs = await helper.blogsInDb()
   expect(currentBlogs).toHaveLength(helper.initialBloglist.length + 1)
+})
+
+test('likes defaults to 0 when omitted during blog creation', async () => {
+  const blog = {
+    title: '2023 Photomicrography Competition',
+    author: 'Nikon',
+    url: 'https://www.nikonsmallworld.com/galleries/2023-photomicrography-competition',
+  }
+
+  const response = await api
+    .post('/api/blogs')
+    .send(blog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  expect(response.body.likes).toEqual(0)
+
 })
