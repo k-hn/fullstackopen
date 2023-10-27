@@ -68,3 +68,20 @@ test('likes defaults to 0 when omitted during blog creation', async () => {
   expect(response.body.likes).toEqual(0)
 
 })
+
+
+test('missing title during blog creation returns 400', async () => {
+  const blog = {
+    author: 'Nikon',
+    url: 'https://www.nikonsmallworld.com/galleries/2023-photomicrography-competition',
+    likes: 23,
+  }
+
+  const response = await api
+    .post('/api/blogs')
+    .send(blog)
+    .expect(400)
+    .expect('Content-Type', /application\/json/)
+
+  expect(response.body.error).toBeDefined()
+})
