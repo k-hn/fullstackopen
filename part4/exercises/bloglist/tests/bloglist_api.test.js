@@ -33,3 +33,21 @@ test('blog contains id key', async () => {
   const blog = (await helper.blogsInDb())[0]
   expect(blog.id).toBeDefined()
 })
+
+test('a valid note can be added', async () => {
+  const blog = {
+    title: '2023 Photomicrography Competition',
+    author: 'Nikon',
+    url: 'https://www.nikonsmallworld.com/galleries/2023-photomicrography-competition',
+    likes: 23,
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(blog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const currentBlogs = await helper.blogsInDb()
+  expect(currentBlogs).toHaveLength(helper.initialBloglist.length + 1)
+})
