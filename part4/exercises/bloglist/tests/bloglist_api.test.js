@@ -9,7 +9,7 @@ const api = supertest(app)
 beforeEach(async () => {
   await Blog.deleteMany()
   await Blog.insertMany(helper.initialBloglist)
-})
+}, 10000)
 
 afterAll(async () => {
   await mongoose.connection.close()
@@ -29,6 +29,7 @@ test('all blogs are returned', async () => {
   expect(response.body).toHaveLength(helper.initialBloglist.length)
 })
 
-
-
-
+test('blog contains id key', async () => {
+  const blog = (await helper.blogsInDb())[0]
+  expect(blog.id).toBeDefined()
+})
