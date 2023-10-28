@@ -90,6 +90,23 @@ describe('post note', () => {
 
     expect(response.body.error).toBeDefined()
   })
+
+  test('missing author during blog creation returns 400', async () => {
+    const blog = {
+      title: '2023 Photomicrography Competition',
+      url: 'https://www.nikonsmallworld.com/galleries/2023-photomicrography-competition',
+      likes: 23,
+    }
+
+    const response = await api
+      .post('/api/blogs')
+      .send(blog)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(response.body.error).toBeDefined()
+  })
+
 })
 
 
@@ -107,7 +124,7 @@ describe('delete note', () => {
   })
 
   test('deleting non-existing blog returns 204', async () => {
-    const nonExistingBlogID = await helper.getNonExistingBlogID()
+    const nonExistingBlogID = (await helper.getNonExistingBlog())._id.toString()
 
     await api
       .delete(`/api/blogs/${nonExistingBlogID}`)
@@ -115,5 +132,48 @@ describe('delete note', () => {
 
     const blogsAfterDelete = await helper.blogsInDb()
     expect(blogsAfterDelete).toHaveLength(helper.initialBloglist.length)
+  })
+})
+
+
+describe('update note', () => {
+  test('updating existing blog passes', async () => {
+    const blogs = await helper.blogsInDb()
+    const { id, title, author, url } = blogs[0]
+    const blogToUpdate = {
+      title,
+      author,
+      url,
+      likes: 1000
+    }
+
+    const response = await api
+      .put(`/api/blogs/${id}`)
+      .send(blogToUpdate)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    expect(response.body.likes).toEqual(1000)
+  })
+})
+
+describe('get specific blog', () => {
+  test('getting existing blog succeeds', async () => {
+    const blogs = await helper.blogsInDb()
+    const blogToGet = blogs[0]
+
+    await api
+      .get(`/api/blogs/${blogToGet.id}`)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+  })
+
+  test('getting non-existing blog fails', async () => {
+    const nonExistingBlog = await helper.getNonExistingBlog()
+
+    await api
+      .get(`/api/blogs/${nonExistingBlog.id}`)
+      .expect(404)
+
   })
 })

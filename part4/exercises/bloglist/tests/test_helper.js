@@ -58,7 +58,7 @@ const blogsInDb = async () => {
   return blogs
 }
 
-const getNonExistingBlogID = async () => {
+const getNonExistingBlog = async () => {
   const blog = new Blog(
     {
       title: '2023 Photomicrography Competition',
@@ -69,12 +69,11 @@ const getNonExistingBlogID = async () => {
 
   await blog.save()
   await blog.deleteOne()
-  console.log("blog id: ", blog.id)
-  return blog._id.toString()
+  return blog
 }
 
 module.exports = {
   initialBloglist,
   blogsInDb,
-  getNonExistingBlogID
+  getNonExistingBlog
 }
