@@ -58,8 +58,23 @@ const blogsInDb = async () => {
   return blogs
 }
 
+const getNonExistingBlogID = async () => {
+  const blog = new Blog(
+    {
+      title: '2023 Photomicrography Competition',
+      author: 'Nikon',
+      url: 'https://www.nikonsmallworld.com/galleries/2023-photomicrography-competition',
+      likes: 23,
+    })
+
+  await blog.save()
+  await blog.deleteOne()
+  console.log("blog id: ", blog.id)
+  return blog._id.toString()
+}
 
 module.exports = {
   initialBloglist,
-  blogsInDb
+  blogsInDb,
+  getNonExistingBlogID
 }
