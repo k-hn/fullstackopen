@@ -1,4 +1,7 @@
+const bcrypt = require('bcrypt')
 const Blog = require('../models/blog')
+const User = require('../models/user')
+
 
 const initialBloglist =
   [
@@ -72,8 +75,29 @@ const getNonExistingBlog = async () => {
   return blog
 }
 
+const createSuperUser = async () => {
+  const passwordHash = await bcrypt.hash('sekret', 10)
+  const user = await User({
+    username: 'root',
+    name: 'Superuser',
+    passwordHash
+  })
+
+  await user.save()
+
+  return user
+}
+
+const usersInDb = async () => {
+  const users = await User.find({})
+
+  return users
+}
+
 module.exports = {
   initialBloglist,
   blogsInDb,
-  getNonExistingBlog
+  getNonExistingBlog,
+  createSuperUser,
+  usersInDb
 }

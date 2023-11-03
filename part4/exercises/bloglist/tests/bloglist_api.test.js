@@ -2,14 +2,17 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const helper = require('./test_helper')
 
 const api = supertest(app)
 
 beforeEach(async () => {
-  await Blog.deleteMany()
+  await Blog.deleteMany({})
+  await User.deleteMany({})
   await Blog.insertMany(helper.initialBloglist)
-}, 15000)
+  await helper.createSuperUser()
+}, 10000)
 
 afterAll(async () => {
   await mongoose.connection.close()
@@ -175,5 +178,119 @@ describe('get specific blog', () => {
       .get(`/api/blogs/${nonExistingBlog.id}`)
       .expect(404)
 
+  })
+})
+
+
+describe('post user', () => {
+  test('passes with valid data', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const userData = {
+      username: 'groot',
+      name: 'Groot Sr.',
+      password: 'I am groot'
+    }
+
+    await api
+      .post('/api/users')
+      .send(userData)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+
+    expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
+  })
+
+  test('fails without username field', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const userData = {
+      name: 'Groot Sr.',
+      password: 'I am groot'
+    }
+
+    await api
+      .post('/api/users')
+      .send(userData)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+
+    expect(usersAtEnd).toHaveLength(usersAtStart.length)
+
+  })
+
+  test('fails without name field', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const userData = {
+      username: 'groot',
+      password: 'I am groot'
+    }
+
+    await api
+      .post('/api/users')
+      .send(userData)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+
+    expect(usersAtEnd).toHaveLength(usersAtStart.length)
+  })
+
+  test('fails without password field', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const userData = {
+      username: 'groot',
+      name: 'Groot Sr.',
+    }
+
+    await api
+      .post('/api/users')
+      .send(userData)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+
+    expect(usersAtEnd).toHaveLength(usersAtStart.length)
+  })
+
+  test('fails when username is shorter than expected minimum length', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const userData = {
+      username: 'g',
+      name: 'Groot Sr.',
+      password: 'I am groot'
+    }
+
+    await api
+      .post('/api/users')
+      .send(userData)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+
+    expect(usersAtEnd).toHaveLength(usersAtStart.length)
+
+  })
+})
+
+describe('get users', () => {
+  test('passes for valid request', async () => {
+    const response = await api
+      .get('/api/users')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    usernames = response.body.map(u => u.username)
+    expect(usernames).toContain('root')
   })
 })
