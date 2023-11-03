@@ -26,12 +26,7 @@ blogsRouter.post('/', async (request, response) => {
     request.body.likes = 0
   }
 
-  // assign blog to user named root
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-  if (decodedToken.id === undefined) {
-    return response.status(401).json({ error: 'token invalid' })
-  }
-  const user = await User.findById(decodedToken.id)
+  const user = request.user
   request.body.user = user.id
 
   const blog = new Blog(request.body)
@@ -46,14 +41,10 @@ blogsRouter.post('/', async (request, response) => {
 
 blogsRouter.delete('/:id', async (request, response) => {
   // only allow creator of blog delete privileges
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-  if (decodedToken.id === undefined) {
-    return response.status(401).json({ error: 'token invalid' })
-  }
-
+  const user = request.user
   const blog = await Blog.findById(request.params.id)
 
-  if (blog.user.toString() === decodedToken.id.toString()) {
+  if (blog.user.toString() === user.id) {
     await blog.deleteOne()
     return response.status(204).end()
   } else {
