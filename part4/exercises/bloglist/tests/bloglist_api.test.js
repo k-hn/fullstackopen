@@ -281,6 +281,29 @@ describe('post user', () => {
     expect(usersAtEnd).toHaveLength(usersAtStart.length)
 
   })
+
+  test('fails when password is less than 3 characters', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const userData = {
+      username: 'groot',
+      name: 'Groot Sr.',
+      password: 'Ia'
+    }
+
+    await api
+      .post('/api/users')
+      .send(userData)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+
+    expect(usersAtEnd).toHaveLength(usersAtStart.length)
+  })
+
+
+
 })
 
 describe('get users', () => {
