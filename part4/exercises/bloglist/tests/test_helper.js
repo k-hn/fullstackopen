@@ -11,6 +11,7 @@ const initialBloglist =
       author: 'Michael Chan',
       url: 'https://reactpatterns.com/',
       likes: 7,
+      user: '6545822f3113e325c5d5da50',
       __v: 0
     },
     {
@@ -19,6 +20,7 @@ const initialBloglist =
       author: 'Edsger W. Dijkstra',
       url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
       likes: 5,
+      user: '6545822f3113e325c5d5da50',
       __v: 0
     },
     {
@@ -27,6 +29,7 @@ const initialBloglist =
       author: 'Edsger W. Dijkstra',
       url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
       likes: 12,
+      user: '6545822f3113e325c5d5da50',
       __v: 0
     },
     {
@@ -35,6 +38,7 @@ const initialBloglist =
       author: 'Robert C. Martin',
       url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
       likes: 10,
+      user: '6545822f3113e325c5d5da50',
       __v: 0
     },
     {
@@ -43,6 +47,7 @@ const initialBloglist =
       author: 'Robert C. Martin',
       url: 'http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html',
       likes: 0,
+      user: '6545822f3113e325c5d5da50',
       __v: 0
     },
     {
@@ -51,6 +56,7 @@ const initialBloglist =
       author: 'Robert C. Martin',
       url: 'http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html',
       likes: 2,
+      user: '6545822f3113e325c5d5da50',
       __v: 0
     }
   ]
@@ -78,6 +84,7 @@ const getNonExistingBlog = async () => {
 const createSuperUser = async () => {
   const passwordHash = await bcrypt.hash('sekret', 10)
   const user = await User({
+    _id: '6545822f3113e325c5d5da50',
     username: 'root',
     name: 'Superuser',
     passwordHash
@@ -94,10 +101,24 @@ const usersInDb = async () => {
   return users
 }
 
+const loginUser = async (api, username, password) => {
+  const loginDetails = {
+    username,
+    password
+  }
+
+  const response = await api
+    .post('/api/login')
+    .send(loginDetails)
+
+  return response.body
+}
+
 module.exports = {
   initialBloglist,
   blogsInDb,
   getNonExistingBlog,
   createSuperUser,
-  usersInDb
+  usersInDb,
+  loginUser
 }

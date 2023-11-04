@@ -21,15 +21,21 @@ afterAll(async () => {
 
 describe('get notes', () => {
   test('blog list is returned as json', async () => {
+    const loginResponse = await helper.loginUser(api, 'root', 'sekret')
+
     await api
       .get('/api/blogs')
+      .set('Authorization', `Bearer ${loginResponse.token}`)
       .expect(200)
       .expect('Content-Type', /application\/json/)
   })
 
   test('all blogs are returned', async () => {
+    const loginResponse = await helper.loginUser(api, 'root', 'sekret')
+
     const response = await api
       .get('/api/blogs')
+      .set('Authorization', `Bearer ${loginResponse.token}`)
 
     expect(response.body).toHaveLength(helper.initialBloglist.length)
   })
@@ -43,6 +49,8 @@ describe('get notes', () => {
 
 describe('post note', () => {
   test('a valid note can be added', async () => {
+    const loginResponse = await helper.loginUser(api, 'root', 'sekret')
+
     const blog = {
       title: '2023 Photomicrography Competition',
       author: 'Nikon',
@@ -52,6 +60,7 @@ describe('post note', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${loginResponse.token}`)
       .send(blog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -67,8 +76,11 @@ describe('post note', () => {
       url: 'https://www.nikonsmallworld.com/galleries/2023-photomicrography-competition',
     }
 
+    const loginResponse = await helper.loginUser(api, 'root', 'sekret')
+
     const response = await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${loginResponse.token}`)
       .send(blog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -85,8 +97,11 @@ describe('post note', () => {
       likes: 23,
     }
 
+    const loginResponse = await helper.loginUser(api, 'root', 'sekret')
+
     const response = await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${loginResponse.token}`)
       .send(blog)
       .expect(400)
       .expect('Content-Type', /application\/json/)
@@ -101,8 +116,11 @@ describe('post note', () => {
       likes: 23,
     }
 
+    const loginResponse = await helper.loginUser(api, 'root', 'sekret')
+
     const response = await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${loginResponse.token}`)
       .send(blog)
       .expect(400)
       .expect('Content-Type', /application\/json/)
@@ -110,6 +128,22 @@ describe('post note', () => {
     expect(response.body.error).toBeDefined()
   })
 
+  test('fails when no bearer token is provided', async () => {
+    const blog = {
+      title: '2023 Photomicrography Competition',
+      author: 'Nikon',
+      url: 'https://www.nikonsmallworld.com/galleries/2023-photomicrography-competition',
+      likes: 23,
+    }
+
+    const response = await api
+      .post('/api/blogs')
+      .send(blog)
+      .expect(401)
+      .expect('Content-Type', /application\/json/)
+
+    expect(response.body.error).toBeDefined()
+  })
 })
 
 
@@ -118,8 +152,11 @@ describe('delete note', () => {
     const blogs = await helper.blogsInDb()
     const blogToDelete = blogs[0]
 
-    await api
+    const loginResponse = await helper.loginUser(api, 'root', 'sekret')
+
+    const response = await api
       .delete(`/api/blogs/${blogToDelete.id}`)
+      .set('Authorization', `Bearer ${loginResponse.token}`)
       .expect(204)
 
     const blogsAfterDeletion = await helper.blogsInDb()
@@ -128,13 +165,52 @@ describe('delete note', () => {
 
   test('deleting non-existing blog returns 204', async () => {
     const nonExistingBlogID = (await helper.getNonExistingBlog())._id.toString()
+    const loginResponse = await helper.loginUser(api, 'root', 'sekret')
 
     await api
       .delete(`/api/blogs/${nonExistingBlogID}`)
-      .expect(204)
+      .set('Authorization', `Bearer ${loginResponse.token}`)
+      .expect(404)
+      .expect('Content-Type', /application\/json/)
 
     const blogsAfterDelete = await helper.blogsInDb()
     expect(blogsAfterDelete).toHaveLength(helper.initialBloglist.length)
+  })
+
+  test('fails when non-owner makes request to delete', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+
+    // create user
+    const userDetails = {
+      username: 'root2',
+      name: 'midUser',
+      password: 'midmidmid'
+    }
+    const userResponse = await api
+      .post('/api/users')
+      .send(userDetails)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    // log created user in
+    const loginDetails = {
+      username: userDetails.username,
+      password: userDetails.password
+    }
+
+    const loginResponse = await helper.loginUser(api, userDetails.username, userDetails.password)
+
+    // attempt to delete blog created by root
+    const blogToDelete = helper.initialBloglist[0]
+
+    const response = await api
+      .delete(`/api/blogs/${blogToDelete._id}`)
+      .set('Authorization', `Bearer ${loginResponse.token}`)
+      .expect(401)
+      .expect('Content-Type', /application\/json/)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    expect(blogsAtEnd).toHaveLength(blogsAtStart.length)
   })
 })
 
@@ -149,9 +225,11 @@ describe('update note', () => {
       url,
       likes: 1000
     }
+    const loginResponse = await helper.loginUser(api, 'root', 'sekret')
 
     const response = await api
       .put(`/api/blogs/${id}`)
+      .set('Authorization', `Bearer ${loginResponse.token}`)
       .send(blogToUpdate)
       .expect(200)
       .expect('Content-Type', /application\/json/)
@@ -164,18 +242,22 @@ describe('get specific blog', () => {
   test('getting existing blog succeeds', async () => {
     const blogs = await helper.blogsInDb()
     const blogToGet = blogs[0]
+    const loginResponse = await helper.loginUser(api, 'root', 'sekret')
 
     await api
       .get(`/api/blogs/${blogToGet.id}`)
+      .set('Authorization', `Bearer ${loginResponse.token}`)
       .expect(200)
       .expect('Content-Type', /application\/json/)
   })
 
   test('getting non-existing blog fails', async () => {
     const nonExistingBlog = await helper.getNonExistingBlog()
+    const loginResponse = await helper.loginUser(api, 'root', 'sekret')
 
     await api
       .get(`/api/blogs/${nonExistingBlog.id}`)
+      .set('Authorization', `Bearer ${loginResponse.token}`)
       .expect(404)
 
   })
