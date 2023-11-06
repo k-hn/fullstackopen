@@ -3,12 +3,16 @@ import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import BlogForm from './components/BlogForm'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
   const [user, setUser] = useState(null)
+  const [blogTitle, setBlogTitle] = useState("")
+  const [blogAuthor, setBlogAuthor] = useState("")
+  const [blogURL, setBlogURL] = useState("")
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -59,8 +63,30 @@ const App = () => {
   const handleLogout = () => {
     // remove entry from local storage
     window.localStorage.removeItem("loggedInBlogAppUser")
-    blogService.setToken(null)
     setUser(null)
+  }
+
+  const handleBlogSubmit = async (event) => {
+    event.preventDefault()
+    const newBlog = {
+      title: blogTitle,
+      author: blogAuthor,
+      url: blogURL
+    }
+
+    try {
+      const savedBlog = await blogService.create(newBlog)
+      setBlogs(blogs.concat(savedBlog))
+      clearBlogForm()
+    } catch (exception) {
+      console.log(exception)
+    }
+  }
+
+  const clearBlogForm = () => {
+    setBlogTitle("")
+    setBlogAuthor("")
+    setBlogURL("")
   }
 
   if (user === null) {
@@ -82,16 +108,31 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
-      <p>{user.username} logged in</p>
-      <button onClick={handleLogout}>log out</button>
-
+      <p>
+        {user.username} logged in
+        <button onClick={handleLogout}>logout</button>
+      </p>
       <div>
         {blogs.map(blog =>
           <Blog key={blog.id} blog={blog} />
         )}
       </div>
+      <div>
+        <h1>create new </h1>
+        <BlogForm
+          blogTitle={blogTitle}
+          blogAuthor={blogAuthor}
+          blogURL={blogURL}
+          setBlogTitle={setBlogTitle}
+          setBlogAuthor={setBlogAuthor}
+          setBlogURL={setBlogURL}
+          handleBlogSubmit={handleBlogSubmit}
+        />
+      </div>
     </div>
   )
 }
+
+
 
 export default App
