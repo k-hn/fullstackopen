@@ -29,8 +29,6 @@ const errorHandler = (error, request, response, next) => {
 }
 
 const getJWT = (request) => {
-  console.log("request auth: ", request.authorization)
-  console.log("request.headers", request.headers)
   const authorization = request.get('authorization')
   if (authorization && authorization.startsWith('Bearer ')) {
     return authorization.replace('Bearer ', '')
@@ -47,7 +45,6 @@ const tokenExtractor = (request, response, next) => {
 
 const userExtractor = async (request, response, next) => {
   const token = getJWT(request)
-  console.log("token: ", token)
   const decodedToken = jwt.verify(token, process.env.SECRET)
   if (decodedToken.id === undefined) {
     return response
