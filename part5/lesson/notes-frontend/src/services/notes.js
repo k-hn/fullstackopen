@@ -17,7 +17,7 @@ const getAll = () => {
   return response.then(response => response.data.concat(nonExisting))
 }
 
-const create = async (newObject) => {
+const create = (newObject) => {
   const config = {
     headers: { Authorization: token }
   }
